@@ -1,6 +1,12 @@
 
 # Project 6: Particle System
 
+## External References
+- [Stack Overflow post about tracking mouse position in JavaScript](https://stackoverflow.com/questions/7790725/javascript-track-mouse-position)
+- [Mozilla documentation for addEventListener (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
+- [Mozilla documentation for MouseEvent (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent)
+
+
 **Goal:** to make physics-based procedural animation of particles and to practice using OpenGL's instanced rendering system.
 
 **Inspiration:** DMD and CGGT alumnus Nop Jiarathanakul's [Particle Dream application](http://www.iamnop.com/particles/).
