@@ -134,7 +134,7 @@ function main() {
         // get world-space ray direction
         let direction = vec3.fromValues(worldPos[0], worldPos[1], worldPos[2]);
         vec3.subtract(direction, direction, camera.position);
-        vec3.normalize(direction, direction); 
+        vec3.normalize(direction, direction);
 
         // compute final position
         let attractPos = vec3.create();
@@ -143,15 +143,29 @@ function main() {
     }
 
     window.addEventListener('mousedown', function (event: MouseEvent) {
-        // enable attractor
-        particleSystem.mouseAttractor.enable();
-
         let attractPos = raycast(event);
-        vec3.set(particleSystem.mouseAttractor.target, attractPos[0], attractPos[1], attractPos[2]);
+
+        if (event.buttons & 1) {
+            // enable attractor
+            particleSystem.mouseAttractor.enable();
+
+            vec3.set(particleSystem.mouseAttractor.target, attractPos[0], attractPos[1], attractPos[2]);
+        }
+        if (event.buttons & 2) {
+            // enable attractor
+            particleSystem.mouseRepeller.enable();
+
+            vec3.set(particleSystem.mouseRepeller.target, attractPos[0], attractPos[1], attractPos[2]);
+        }
     }, false);
 
     window.addEventListener('mouseup', function (event: MouseEvent) {
-        particleSystem.mouseAttractor.disable();
+        if (!(event.buttons & 1)) {
+            particleSystem.mouseAttractor.disable();
+        }
+        if (!(event.buttons & 2)) {
+            particleSystem.mouseRepeller.disable();
+        }
     }, false);
 
     renderer.setSize(window.innerWidth, window.innerHeight);

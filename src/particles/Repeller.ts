@@ -32,7 +32,8 @@ class Repeller extends TargetForce {
         }   
 
         vec3.normalize(diff, diff);
-        vec3.scale(diff, diff, -this.intensity / distScale * 0.1);
+        vec3.scale(diff, diff, -this.intensity / distScale * 10.0);
+        particle.color[0] = 1.0;
 
         /*
         // reduce velocity if close to target
