@@ -7,7 +7,7 @@ function clamp(min: number, max: number, val: number): number {
            val > max ? max : val;
 }
 
-class Attractor extends TargetForce {
+class Repeller extends TargetForce {
     constructor(target: vec3, intensity: number, enable: boolean) {
         super(target, intensity, enable);
     }
@@ -16,16 +16,13 @@ class Attractor extends TargetForce {
         if (!this.isEnabled) {
             return;
         }
-        // want to do two things:
-        // 1. move towards target
-        // 2. reduce velocity if close to target
 
-        // move towards target
+        // move away from target
         let diff = vec3.create();
         vec3.subtract(diff, this.target, particle.position);
 
         let dist = vec3.length(diff);
-        let distScale = clamp(2.5, 50.0, dist);
+        let distScale = clamp(0.5, 10.0, dist);
 
         if (dist < 1.0) {
             dist *= -1;
@@ -33,11 +30,11 @@ class Attractor extends TargetForce {
         else if (dist > 5.0) {
             dist = 5.0;
         }   
-        //let sqrDist = clamp(0.1, 2.0, vec3.length(diff));
 
         vec3.normalize(diff, diff);
-        vec3.scale(diff, diff, this.intensity * distScale * 0.1);
+        vec3.scale(diff, diff, -this.intensity / distScale * 0.1);
 
+        /*
         // reduce velocity if close to target
         if (dist < 10.0) {
             particle.color[0] = 0.0;
@@ -53,6 +50,7 @@ class Attractor extends TargetForce {
             particle.color[0] = 0.0;
         }
         particle.color[1] = Math.abs(particle.velocity[0] * 10000);
+        */
 
         vec3.add(particle.acceleration, particle.acceleration, diff);
         //vec3.copy(particle.velocity, diff);
@@ -60,4 +58,4 @@ class Attractor extends TargetForce {
 
 };
 
-export default Attractor;
+export default Repeller;

@@ -1,5 +1,6 @@
 import Particle from './Particle';
 import Attractor from './Attractor';
+import Repeller from './Repeller';
 import Square from '../geometry/Square';
 import {vec3, vec4, mat4} from 'gl-matrix';
 
@@ -12,6 +13,7 @@ class ParticleSystem {
     accTime: number;
 
     mouseAttractor: Attractor;
+    mouseRepeller: Repeller;
 
     constructor(n: number, square: Square) {
         this.accTime = 0.0;
@@ -32,7 +34,8 @@ class ParticleSystem {
             }
         }
 
-        this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0001);
+        this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0001, false);
+        this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
     }
 
     updateInstanceArrays(particle: Particle, index: number) {
@@ -67,6 +70,7 @@ class ParticleSystem {
             //vec3.copy(value.acceleration, acc);
             vec3.set(value.acceleration, 0, 0, 0);
             this.mouseAttractor.applyForce(value);
+            this.mouseRepeller.applyForce(value);
             vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
             this.updateInstanceArrays(value, index);
