@@ -116,10 +116,8 @@ function main() {
         camera.updateProjectionMatrix();
     }, false);
 
-    window.addEventListener('mousedown', function (event: MouseEvent) {
-        // enable attractor
-        particleSystem.mouseAttractor.enable();
-        // raycast
+    function raycast(event: MouseEvent): vec3 {
+        // create screen point
         let screenPos = vec4.fromValues(
             2.0 * event.clientX / window.innerWidth - 1.0,
             -2.0 * event.clientY / window.innerHeight + 1.0,
@@ -129,18 +127,26 @@ function main() {
         console.log([screenPos[0], screenPos[1]]);
         vec4.scale(screenPos, screenPos, camera.far);
 
+        // create world-space screen point
         let worldPos = vec4.create();
         vec4.transformMat4(worldPos, screenPos, camera.getInvViewProjMatrix());
 
-
+        // get world-space ray direction
         let direction = vec3.fromValues(worldPos[0], worldPos[1], worldPos[2]);
         vec3.subtract(direction, direction, camera.position);
         vec3.normalize(direction, direction); 
 
+        // compute final position
         let attractPos = vec3.create();
         vec3.scaleAndAdd(attractPos, camera.position, direction, 20.0);
-        //vec3.set(attractPos, worldPos[0], worldPos[1], worldPos[2]);
+        return attractPos;
+    }
 
+    window.addEventListener('mousedown', function (event: MouseEvent) {
+        // enable attractor
+        particleSystem.mouseAttractor.enable();
+
+        let attractPos = raycast(event);
         vec3.set(particleSystem.mouseAttractor.target, attractPos[0], attractPos[1], attractPos[2]);
     }, false);
 
