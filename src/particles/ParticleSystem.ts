@@ -48,7 +48,10 @@ class ParticleSystem {
 
     // dT: delta time
     update(dT: number) {
-        this.accTime += dT;
+        let newTime = this.accTime + dT;
+        let intervals = Math.floor(newTime / 16.0) - Math.floor(this.accTime / 16.0);
+        let drag = Math.pow(0.9985, intervals);
+        this.accTime = newTime;
 
         let acc: vec3 = vec3.fromValues(0, 0, 0.0001);
 
@@ -64,6 +67,7 @@ class ParticleSystem {
             //vec3.copy(value.acceleration, acc);
             vec3.set(value.acceleration, 0, 0, 0);
             this.mouseAttractor.applyForce(value);
+            vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
             this.updateInstanceArrays(value, index);
         }, this);

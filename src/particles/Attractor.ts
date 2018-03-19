@@ -9,13 +9,26 @@ function clamp(min: number, max: number, val: number): number {
 class Attractor {
     target: vec3;
     intensity: number;
+    isEnabled: boolean;
 
     constructor(target: vec3, intensity: number) {
         this.target = target;
         this.intensity = intensity;
+        this.isEnabled = true;
+    }
+
+    enable() {
+        this.isEnabled = true;
+    }
+
+    disable() {
+        this.isEnabled = false;
     }
 
     applyForce(particle: Particle) {
+        if (!this.isEnabled) {
+            return;
+        }
         // want to do two things:
         // 1. move towards target
         // 2. reduce velocity if close to target

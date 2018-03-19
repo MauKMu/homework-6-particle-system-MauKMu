@@ -117,9 +117,13 @@ function main() {
     }, false);
 
     window.addEventListener('mousedown', function (event: MouseEvent) {
-        console.log(event);
+        particleSystem.mouseAttractor.enable();
         //console.log("X: " + event.clientX);
         //console.log("Y: " + event.clientY);
+    }, false);
+
+    window.addEventListener('mouseup', function (event: MouseEvent) {
+        particleSystem.mouseAttractor.disable();
     }, false);
 
     renderer.setSize(window.innerWidth, window.innerHeight);
