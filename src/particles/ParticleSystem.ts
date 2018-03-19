@@ -59,9 +59,9 @@ class ParticleSystem {
             acc[2] *= -1;
         }
 
-        if (this.accTime > 5000.0) {
-            this.mouseAttractor.target[0] = 10.0;
-        }
+        //if (this.accTime > 5000.0) {
+            //this.mouseAttractor.target[0] = 10.0;
+        //}
 
         this.particles.forEach(function (value: Particle, index: number) {
             //vec3.copy(value.acceleration, acc);

@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -117,9 +117,31 @@ function main() {
     }, false);
 
     window.addEventListener('mousedown', function (event: MouseEvent) {
+        // enable attractor
         particleSystem.mouseAttractor.enable();
-        //console.log("X: " + event.clientX);
-        //console.log("Y: " + event.clientY);
+        // raycast
+        let screenPos = vec4.fromValues(
+            2.0 * event.clientX / window.innerWidth - 1.0,
+            -2.0 * event.clientY / window.innerHeight + 1.0,
+            1,
+            1
+        );
+        console.log([screenPos[0], screenPos[1]]);
+        vec4.scale(screenPos, screenPos, camera.far);
+
+        let worldPos = vec4.create();
+        vec4.transformMat4(worldPos, screenPos, camera.getInvViewProjMatrix());
+
+
+        let direction = vec3.fromValues(worldPos[0], worldPos[1], worldPos[2]);
+        vec3.subtract(direction, direction, camera.position);
+        vec3.normalize(direction, direction); 
+
+        let attractPos = vec3.create();
+        vec3.scaleAndAdd(attractPos, camera.position, direction, 20.0);
+        //vec3.set(attractPos, worldPos[0], worldPos[1], worldPos[2]);
+
+        vec3.set(particleSystem.mouseAttractor.target, attractPos[0], attractPos[1], attractPos[2]);
     }, false);
 
     window.addEventListener('mouseup', function (event: MouseEvent) {
