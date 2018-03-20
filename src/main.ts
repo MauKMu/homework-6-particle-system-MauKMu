@@ -36,9 +36,13 @@ function loadMesh(filename: string) {
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
+const ENABLE_CAM_MOVEMENT = "Enable camera movement"
+const ENABLE_CLICK_FORCES = "Enable click forces"
 const controls = {
     tesselations: 5,
     'Load Scene': loadScene, // A function pointer, essentially
+    "Enable camera movement": true,
+    "Enable click forces": true
 };
 
 let square: Square;
@@ -99,6 +103,8 @@ function main() {
 
     // Add controls to the gui
     const gui = new DAT.GUI();
+    let camMovController = gui.add(controls, ENABLE_CAM_MOVEMENT);
+    gui.add(controls, ENABLE_CLICK_FORCES);
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -119,6 +125,20 @@ function main() {
     renderer.setClearColor(0.2, 0.2, 0.2, 1);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
+
+    // set up controller listeners
+    camMovController.onChange(function (val: boolean) {
+        if (val) {
+            camera.controls.rotateSpeed = 1;
+            camera.controls.zoomSpeed = 1;
+            camera.controls.translateSpeed = 1;
+        }
+        else {
+            camera.controls.rotateSpeed = 0;
+            camera.controls.zoomSpeed = 0;
+            camera.controls.translateSpeed = 0;
+        }
+    });
 
     const lambert = new ShaderProgram([
         new Shader(gl.VERTEX_SHADER, require('./shaders/particle-vert.glsl')),
@@ -192,8 +212,15 @@ function main() {
     }
 
     function handleMouseDown(event: MouseEvent) {
+        // ignore if not on canvas
+        if (event.target != canvas) {
+            return;
+        }
         // update mouse position for shader
         if (!event.buttons) {
+            return;
+        }
+        if (!controls[ENABLE_CLICK_FORCES]) {
             return;
         }
         vec2.set(mousePos,
@@ -221,7 +248,13 @@ function main() {
     window.addEventListener('mousemove', handleMouseDown, false);
 
     window.addEventListener('mouseup', function (event: MouseEvent) {
-        console.log("UP");
+        // ignore if not on canvas
+        if (event.target != canvas) {
+            return;
+        }
+        if (!controls[ENABLE_CLICK_FORCES]) {
+            return;
+        }
         // update mouse position for shader
         vec2.set(mousePos, -2, -2);
 

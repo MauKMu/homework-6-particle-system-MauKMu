@@ -36,7 +36,7 @@ class ParticleSystem {
             }
         }
 
-        this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0001, false);
+        this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0003, false);
         this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
         this.meshAttractor = null;
     }
