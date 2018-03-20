@@ -5,6 +5,9 @@
 - [Stack Overflow post about tracking mouse position in JavaScript](https://stackoverflow.com/questions/7790725/javascript-track-mouse-position)
 - [Mozilla documentation for addEventListener (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
 - [Mozilla documentation for MouseEvent (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent)
+- [Stack Overflow post about generating random points inside triangle](https://stackoverflow.com/questions/19654251/random-point-inside-triangle-inside-java)
+- [Stack Exchange post about generating random points inside triangle](https://math.stackexchange.com/questions/18686/uniform-random-point-in-triangle)
+
 
 
 **Goal:** to make physics-based procedural animation of particles and to practice using OpenGL's instanced rendering system.
