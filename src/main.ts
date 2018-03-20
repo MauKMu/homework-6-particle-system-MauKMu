@@ -131,6 +131,7 @@ function main() {
     ]);
 
     lastTickTime = Date.now();
+    let startTime = lastTickTime;
 
     // This function will be called every frame
     function tick() {
@@ -141,9 +142,10 @@ function main() {
 
         camera.update();
         stats.begin();
-        lambert.setTime(time++);
+        //lambert.setTime(time++);
         bgShader.setDims(vec2.fromValues(window.innerWidth, window.innerHeight));
         bgShader.setMousePos(mousePos);
+        bgShader.setTime(now - startTime);
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         renderer.render(camera, lambert, [
