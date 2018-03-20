@@ -1,6 +1,7 @@
 import Particle from './Particle';
 import Attractor from './Attractor';
 import Repeller from './Repeller';
+import MeshAttractor from './MeshAttractor';
 import Square from '../geometry/Square';
 import {vec3, vec4, mat4} from 'gl-matrix';
 
@@ -14,6 +15,7 @@ class ParticleSystem {
 
     mouseAttractor: Attractor;
     mouseRepeller: Repeller;
+    meshAttractor: MeshAttractor;
 
     constructor(n: number, square: Square) {
         this.accTime = 0.0;
@@ -36,6 +38,7 @@ class ParticleSystem {
 
         this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0001, false);
         this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
+        this.meshAttractor = null;
     }
 
     updateInstanceArrays(particle: Particle, index: number) {
@@ -47,6 +50,10 @@ class ParticleSystem {
         this.colors[4 * index + 1] = particle.color[1];
         this.colors[4 * index + 2] = particle.color[2];
         this.colors[4 * index + 3] = particle.color[3];
+    }
+
+    setMeshAttractor(meshAttractor: MeshAttractor) {
+        this.meshAttractor = meshAttractor;
     }
 
     // dT: delta time
@@ -71,6 +78,9 @@ class ParticleSystem {
             vec3.set(value.acceleration, 0, 0, 0);
             this.mouseAttractor.applyForce(value);
             this.mouseRepeller.applyForce(value);
+            if (this.meshAttractor != null) {
+                this.meshAttractor.applyMeshForce(value, index);
+            }
             vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
             this.updateInstanceArrays(value, index);

@@ -7,6 +7,7 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import ParticleSystem from './particles/ParticleSystem';
+import MeshAttractor from './particles/MeshAttractor';
 
 var OBJ = require('webgl-obj-loader');
 let objString: string = "";
@@ -51,8 +52,10 @@ function loadScene() {
 
     particleSystem = new ParticleSystem(50, square);
 
-    loadMesh("models/n64.obj");
+    loadMesh("models/suzanne.obj");
     console.log(mesh);
+    let ma = new MeshAttractor(0.0001, true, mesh, 13);
+    particleSystem.setMeshAttractor(ma);
 
     /*
     // Set up particles here. Hard-coded example data for now
