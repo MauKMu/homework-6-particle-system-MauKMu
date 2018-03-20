@@ -56,7 +56,16 @@ void main()
     if (u_MousePos.x >= -1.0) {
         vec2 mousePos = u_MousePos * vec2(u_Dims.x / u_Dims.y, 1);
         vec2 p = pos - mousePos; // now p is in mousePos-space
-        vec2 diff = mousePos - pos;
+        // rotate over time
+        float angle = u_Time * 0.003;
+        float c = cos(angle);
+        float s = sin(angle);
+        mat2 rot = mat2(
+            c, s,
+            -s, c
+        );
+        p = rot * p;
+        //vec2 diff = mousePos - pos;
         float metaSum = 0.0;
         metaSum += rawMetaball(p, vec2(0), 0.16);
         metaSum += aniMetaball(p, DIR1, 0.08, 0.0);

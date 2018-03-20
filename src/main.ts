@@ -174,7 +174,6 @@ function main() {
             1,
             1
         );
-        console.log([screenPos[0], screenPos[1]]);
         vec4.scale(screenPos, screenPos, camera.far);
 
         // create world-space screen point
@@ -192,8 +191,11 @@ function main() {
         return attractPos;
     }
 
-    window.addEventListener('mousedown', function (event: MouseEvent) {
+    function handleMouseDown(event: MouseEvent) {
         // update mouse position for shader
+        if (!event.buttons) {
+            return;
+        }
         vec2.set(mousePos,
             2.0 * event.clientX / window.innerWidth - 1.0,
             -2.0 * event.clientY / window.innerHeight + 1.0);
@@ -213,9 +215,13 @@ function main() {
 
             vec3.set(particleSystem.mouseRepeller.target, attractPos[0], attractPos[1], attractPos[2]);
         }
-    }, false);
+    }
+
+    window.addEventListener('mousedown', handleMouseDown, false);
+    window.addEventListener('mousemove', handleMouseDown, false);
 
     window.addEventListener('mouseup', function (event: MouseEvent) {
+        console.log("UP");
         // update mouse position for shader
         vec2.set(mousePos, -2, -2);
 
