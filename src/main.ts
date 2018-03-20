@@ -1,4 +1,4 @@
-import {vec3, vec4} from 'gl-matrix';
+import {vec2, vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -46,6 +46,8 @@ let bgSquare: Square;
 let time: number = 0.0;
 let lastTickTime: number = 0.0;
 let particleSystem: ParticleSystem;
+
+let mousePos: vec2 = vec2.fromValues(-2, -2);
 
 function loadScene() {
     square = new Square(false);
@@ -140,6 +142,8 @@ function main() {
         camera.update();
         stats.begin();
         lambert.setTime(time++);
+        bgShader.setDims(vec2.fromValues(window.innerWidth, window.innerHeight));
+        bgShader.setMousePos(mousePos);
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         renderer.render(camera, lambert, [
@@ -160,11 +164,11 @@ function main() {
         camera.updateProjectionMatrix();
     }, false);
 
-    function raycast(event: MouseEvent): vec3 {
+    function raycast(mousePos: vec2): vec3 {
         // create screen point
         let screenPos = vec4.fromValues(
-            2.0 * event.clientX / window.innerWidth - 1.0,
-            -2.0 * event.clientY / window.innerHeight + 1.0,
+            mousePos[0],
+            mousePos[1],
             1,
             1
         );
@@ -187,7 +191,13 @@ function main() {
     }
 
     window.addEventListener('mousedown', function (event: MouseEvent) {
-        let attractPos = raycast(event);
+        // update mouse position for shader
+        vec2.set(mousePos,
+            2.0 * event.clientX / window.innerWidth - 1.0,
+            -2.0 * event.clientY / window.innerHeight + 1.0);
+
+        // update attractors in particle system
+        let attractPos = raycast(mousePos);
 
         if (event.buttons & 1) {
             // enable attractor
@@ -204,6 +214,9 @@ function main() {
     }, false);
 
     window.addEventListener('mouseup', function (event: MouseEvent) {
+        // update mouse position for shader
+        vec2.set(mousePos, -2, -2);
+
         if (!(event.buttons & 1)) {
             particleSystem.mouseAttractor.disable();
         }
