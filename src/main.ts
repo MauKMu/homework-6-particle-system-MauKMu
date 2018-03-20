@@ -52,9 +52,9 @@ function loadScene() {
 
     particleSystem = new ParticleSystem(50, square);
 
-    loadMesh("models/suzanne.obj");
+    loadMesh("models/n64.obj");
     console.log(mesh);
-    let ma = new MeshAttractor(0.0001, true, mesh, 13);
+    let ma = new MeshAttractor(0.0001, true, mesh, 0.5);
     particleSystem.setMeshAttractor(ma);
 
     /*
