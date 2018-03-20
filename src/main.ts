@@ -42,7 +42,8 @@ const controls = {
     tesselations: 5,
     'Load Scene': loadScene, // A function pointer, essentially
     "Enable camera movement": true,
-    "Enable click forces": true
+    "Enable click forces": true,
+    blah: bleh,
 };
 
 let square: Square;
@@ -52,6 +53,10 @@ let lastTickTime: number = 0.0;
 let particleSystem: ParticleSystem;
 
 let mousePos: vec2 = vec2.fromValues(-2, -2);
+
+function bleh() {
+    console.log(particleSystem.offsets);
+}
 
 function loadScene() {
     square = new Square(false);
@@ -105,6 +110,7 @@ function main() {
     const gui = new DAT.GUI();
     let camMovController = gui.add(controls, ENABLE_CAM_MOVEMENT);
     gui.add(controls, ENABLE_CLICK_FORCES);
+    //gui.add(controls, "blah");
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -150,6 +156,8 @@ function main() {
         new Shader(gl.FRAGMENT_SHADER, require('./shaders/bg-frag.glsl')),
     ]);
 
+    let isMousePressed = false;
+
     lastTickTime = Date.now();
     let startTime = lastTickTime;
 
@@ -161,6 +169,11 @@ function main() {
         lastTickTime = now;
 
         camera.update();
+        if (isMousePressed) {
+            let attractPos = raycast(mousePos);
+            vec3.copy(particleSystem.mouseAttractor.target, attractPos);
+            vec3.copy(particleSystem.mouseRepeller.target, attractPos);
+        }
         stats.begin();
         //lambert.setTime(time++);
         bgShader.setDims(vec2.fromValues(window.innerWidth, window.innerHeight));
@@ -198,6 +211,7 @@ function main() {
 
         // create world-space screen point
         let worldPos = vec4.create();
+        camera.update();
         vec4.transformMat4(worldPos, screenPos, camera.getInvViewProjMatrix());
 
         // get world-space ray direction
@@ -220,6 +234,9 @@ function main() {
         if (!event.buttons) {
             return;
         }
+        else {
+            isMousePressed = true;
+        }
         if (!controls[ENABLE_CLICK_FORCES]) {
             return;
         }
@@ -227,20 +244,13 @@ function main() {
             2.0 * event.clientX / window.innerWidth - 1.0,
             -2.0 * event.clientY / window.innerHeight + 1.0);
 
-        // update attractors in particle system
-        let attractPos = raycast(mousePos);
-
         if (event.buttons & 1) {
             // enable attractor
             particleSystem.mouseAttractor.enable();
-
-            vec3.set(particleSystem.mouseAttractor.target, attractPos[0], attractPos[1], attractPos[2]);
         }
         if (event.buttons & 2) {
             // enable attractor
             particleSystem.mouseRepeller.enable();
-
-            vec3.set(particleSystem.mouseRepeller.target, attractPos[0], attractPos[1], attractPos[2]);
         }
     }
 
@@ -263,6 +273,9 @@ function main() {
         }
         if (!(event.buttons & 2)) {
             particleSystem.mouseRepeller.disable();
+        }
+        if (!event.buttons) {
+            isMousePressed = false;
         }
     }, false);
 

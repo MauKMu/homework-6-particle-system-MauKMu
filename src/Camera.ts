@@ -46,7 +46,7 @@ class Camera {
     }
 
     getInvViewProjMatrix() {
-        if (this.isInvVPMStale) {
+        if (true) {
             this.updateInvViewProjMatrix();
             this.isInvVPMStale = false;
         }
