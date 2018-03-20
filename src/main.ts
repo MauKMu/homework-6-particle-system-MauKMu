@@ -8,6 +8,31 @@ import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import ParticleSystem from './particles/ParticleSystem';
 
+var OBJ = require('webgl-obj-loader');
+let objString: string = "";
+let mesh: any;
+
+function readTextFile(file: string) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4) {
+            if (rawFile.status === 200 || rawFile.status == 0) {
+                objString = rawFile.responseText;
+                mesh = new OBJ.Mesh(objString);
+                //alert(objString);
+            }
+        }
+        //objString = "Error when loading OBJ file!"        
+    }
+    rawFile.send(null);
+}
+
+function loadMesh(filename: string) {
+    objString = "";
+    readTextFile(filename);
+}
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
@@ -25,6 +50,9 @@ function loadScene() {
     square.create();
 
     particleSystem = new ParticleSystem(50, square);
+
+    loadMesh("models/n64.obj");
+    console.log(mesh);
 
     /*
     // Set up particles here. Hard-coded example data for now
