@@ -5,6 +5,8 @@ import MeshAttractor from './MeshAttractor';
 import Square from '../geometry/Square';
 import {vec3, vec4, mat4} from 'gl-matrix';
 
+const BASE_COLOR = vec3.fromValues(0.3, 0.3, 0.3);
+
 class ParticleSystem {
     particles: Array<Particle>;
     offsets: Float32Array;
@@ -63,15 +65,11 @@ class ParticleSystem {
         let drag = Math.pow(0.9985, intervals);
         this.accTime = newTime;
 
-        let acc: vec3 = vec3.fromValues(0, 0, 0.0001);
-
-        if (this.particles[0].velocity[2] > -0.1) {
-            acc[2] *= -1;
-        }
-
         //if (this.accTime > 5000.0) {
             //this.mouseAttractor.target[0] = 10.0;
         //}
+
+        let dir = vec3.create();
 
         this.particles.forEach(function (value: Particle, index: number) {
             //vec3.copy(value.acceleration, acc);
@@ -83,6 +81,10 @@ class ParticleSystem {
             }
             vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
+            // set color
+            vec3.normalize(dir, value.velocity);
+            vec3.scaleAndAdd(dir, BASE_COLOR, dir, 0.3);
+            vec4.set(value.color, dir[0], dir[1], dir[2], 1.0);
             this.updateInstanceArrays(value, index);
         }, this);
 
