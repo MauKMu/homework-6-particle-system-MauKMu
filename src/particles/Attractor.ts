@@ -25,7 +25,7 @@ class Attractor extends TargetForce {
         vec3.subtract(diff, this.target, particle.position);
 
         let dist = vec3.length(diff);
-        let distScale = clamp(2.5, 50.0, dist);
+        let distScale = clamp(2.5, 100.0, dist);
 
         if (dist < 1.0) {
             dist *= -1;

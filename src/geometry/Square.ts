@@ -3,49 +3,61 @@ import Drawable from '../rendering/gl/Drawable';
 import {gl} from '../globals';
 
 class Square extends Drawable {
-  indices: Uint32Array;
-  positions: Float32Array;
-  colors: Float32Array;
-  offsets: Float32Array; // Data for bufTranslate
+    indices: Uint32Array;
+    positions: Float32Array;
+    colors: Float32Array;
+    offsets: Float32Array; // Data for bufTranslate
 
+    isBackground: boolean;
 
-  constructor() {
-    super(); // Call the constructor of the super class. This is required.
-  }
+    constructor(isBackground: boolean = false) {
+        super(); // Call the constructor of the super class. This is required.
+        this.isBackground = isBackground;
+    }
 
-  create() {
+    create() {
 
-  this.indices = new Uint32Array([0, 1, 2,
-                                  0, 2, 3]);
-  this.positions = new Float32Array([-0.5, -0.5, 0, 1,
-                                     0.5, -0.5, 0, 1,
-                                     0.5, 0.5, 0, 1,
-                                     -0.5, 0.5, 0, 1]);
+        this.indices = new Uint32Array([0, 1, 2,
+            0, 2, 3]);
+        if (this.isBackground) {
+            this.positions = new Float32Array([
+                -1, -1, 1, 1,
+                1, -1, 1, 1,
+                1, 1, 1, 1,
+                -1, 1, 1, 1]);
+        }
+        else {
+            this.positions = new Float32Array([
+                -0.5, -0.5, 0, 1,
+                0.5, -0.5, 0, 1,
+                0.5, 0.5, 0, 1,
+                -0.5, 0.5, 0, 1]);
+        }
 
-    this.generateIdx();
-    this.generatePos();
-    this.generateCol();
-    this.generateTranslate();
+        this.generateIdx();
+        this.generatePos();
+        this.generateCol();
+        this.generateTranslate();
 
-    this.count = this.indices.length;
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+        this.count = this.indices.length;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
-    gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
+        gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    console.log(`Created square`);
-  }
+        console.log(`Created square`);
+    }
 
-  setInstanceVBOs(offsets: Float32Array, colors: Float32Array) {
-    this.colors = colors;
-    this.offsets = offsets;
+    setInstanceVBOs(offsets: Float32Array, colors: Float32Array) {
+        this.colors = colors;
+        this.offsets = offsets;
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
-    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
-    gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
-  }
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+        gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
+        gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
+    }
 };
 
 export default Square;

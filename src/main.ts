@@ -42,13 +42,18 @@ const controls = {
 };
 
 let square: Square;
+let bgSquare: Square;
 let time: number = 0.0;
 let lastTickTime: number = 0.0;
 let particleSystem: ParticleSystem;
 
 function loadScene() {
-    square = new Square();
+    square = new Square(false);
     square.create();
+
+    bgSquare = new Square(true);
+    bgSquare.create();
+    bgSquare.setNumInstances(1);
 
     particleSystem = new ParticleSystem(50, square);
 
@@ -118,6 +123,11 @@ function main() {
         new Shader(gl.FRAGMENT_SHADER, require('./shaders/particle-frag.glsl')),
     ]);
 
+    const bgShader = new ShaderProgram([
+        new Shader(gl.VERTEX_SHADER, require('./shaders/bg-vert.glsl')),
+        new Shader(gl.FRAGMENT_SHADER, require('./shaders/bg-frag.glsl')),
+    ]);
+
     lastTickTime = Date.now();
 
     // This function will be called every frame
@@ -134,6 +144,9 @@ function main() {
         renderer.clear();
         renderer.render(camera, lambert, [
             square,
+        ]);
+        renderer.render(camera, bgShader, [
+            bgSquare,
         ]);
         stats.end();
 
