@@ -10,9 +10,22 @@ in vec4 fs_Pos;
 out vec4 out_Col;
 
 // constants
-const float THRESHOLD = 1.4;
+const float THRESHOLD = 8.4;
 const float BLEND_EPSILON = 0.05;
 const float PI = 3.14159265;
+
+const float TIME_OFFSET = -PI * 0.25;
+
+const float DIR_LEN = 0.12;
+const float HALF_SQRT2 = 0.70710678118;
+const vec2 DIR1 = (vec2(+0.0, +1.0)) * DIR_LEN;
+const vec2 DIR2 = (vec2(-HALF_SQRT2, +HALF_SQRT2)) * DIR_LEN;
+const vec2 DIR3 = (vec2(-1.0, +0.0)) * DIR_LEN;
+const vec2 DIR4 = (vec2(-HALF_SQRT2, -HALF_SQRT2)) * DIR_LEN;
+const vec2 DIR5 = (vec2(+0.0, -1.0)) * DIR_LEN;
+const vec2 DIR6 = (vec2(+HALF_SQRT2, -HALF_SQRT2)) * DIR_LEN;
+const vec2 DIR7 = (vec2(+1.0, +0.0)) * DIR_LEN;
+const vec2 DIR8 = (vec2(+HALF_SQRT2, +HALF_SQRT2)) * DIR_LEN;
 
 // metaball helper functions
 
@@ -23,7 +36,7 @@ float rawMetaball(vec2 p, vec2 center, float radius) {
 
 // anime metaball, or ~metaballon animé~
 float aniMetaball(vec2 p, vec2 dir, float radius, float timeOffset) {
-    float dist = cos(u_Time * 0.001 * PI + timeOffset) * 0.5 + 0.5;
+    float dist = cos(u_Time * 0.002 * PI + timeOffset) * 0.5 + 0.5;
     vec2 center = dir * dist;
     return rawMetaball(p, center, radius);
 }
@@ -37,7 +50,7 @@ void main()
     // normalize position based on aspect ratio
     vec2 pos = fs_Pos.xy * vec2(u_Dims.x / u_Dims.y, 1);
     // set default color
-    out_Col = vec4(pos * 0.5 * 0.2 + vec2(0.2), 0.0, 1.0);
+    out_Col = vec4(pos * 0.5 * 0.2 + vec2(0.02), 0.0, 1.0);
 
     // draw shape around mouse cursor
     if (u_MousePos.x >= -1.0) {
@@ -46,7 +59,14 @@ void main()
         vec2 diff = mousePos - pos;
         float metaSum = 0.0;
         metaSum += rawMetaball(p, vec2(0), 0.16);
-        metaSum += aniMetaball(p, vec2(0, 0.3), 0.08, 0.0);
+        metaSum += aniMetaball(p, DIR1, 0.08, 0.0);
+        metaSum += aniMetaball(p, DIR2, 0.08, TIME_OFFSET);
+        metaSum += aniMetaball(p, DIR3, 0.08, TIME_OFFSET * 2.0);
+        metaSum += aniMetaball(p, DIR4, 0.08, TIME_OFFSET * 3.0);
+        metaSum += aniMetaball(p, DIR5, 0.08, TIME_OFFSET * 4.0);
+        metaSum += aniMetaball(p, DIR6, 0.08, TIME_OFFSET * 5.0);
+        metaSum += aniMetaball(p, DIR7, 0.08, TIME_OFFSET * 6.0);
+        metaSum += aniMetaball(p, DIR8, 0.08, TIME_OFFSET * 7.0);
         vec3 BALL_COLOR = vec3(out_Col.xy, 1.0);
 
         if (metaSum >= THRESHOLD) {
