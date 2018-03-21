@@ -33,6 +33,7 @@ class ShaderProgram {
   unifTime: WebGLUniformLocation;
   unifDims: WebGLUniformLocation;
   unifMousePos: WebGLUniformLocation;
+  unifMouseButtons: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -55,6 +56,7 @@ class ShaderProgram {
     this.unifTime      = gl.getUniformLocation(this.prog, "u_Time");
     this.unifDims      = gl.getUniformLocation(this.prog, "u_Dims");
     this.unifMousePos      = gl.getUniformLocation(this.prog, "u_MousePos");
+    this.unifMouseButtons      = gl.getUniformLocation(this.prog, "u_MouseButtons");
   }
 
   use() {
@@ -110,6 +112,13 @@ class ShaderProgram {
     this.use();
     if (this.unifMousePos !== -1) {
         gl.uniform2fv(this.unifMousePos, mousePos);
+    }
+  }
+
+  setMouseButtons(buttons: number) {
+    this.use();
+    if (this.unifMouseButtons !== -1) {
+        gl.uniform1i(this.unifMouseButtons, buttons);
     }
   }
 

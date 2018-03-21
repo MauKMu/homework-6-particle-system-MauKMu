@@ -4,6 +4,7 @@ precision highp float;
 uniform vec2 u_Dims;
 uniform vec2 u_MousePos;
 uniform float u_Time;
+uniform int u_MouseButtons;
 
 in vec4 fs_Pos;
 
@@ -41,6 +42,76 @@ float aniMetaball(vec2 p, vec2 dir, float radius, float timeOffset) {
     return rawMetaball(p, center, radius);
 }
 
+// noise helper functions
+
+// from Adam's demo
+vec2 random2(vec2 p) {
+    //vec2 sinVec = sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))));
+    //return sinVec * 0.5 + vec2(0.5);
+    //return fract(sinVec * 123.45);
+    //return fract(sinVec * 43758.5453);
+    return normalize(2.0 * fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3))))*123.45) - 1.0);
+}
+
+float surflet(vec2 P, vec2 gridPoint)
+{
+    //return (P.x * P.x) * 0.07;
+    // Compute falloff function by converting linear distance to a polynomial
+    float distX = abs(P.x - gridPoint.x);
+    float distY = abs(P.y - gridPoint.y);
+    float tX = 1.0 - 6.0 * pow(distX, 5.0) + 15.0 * pow(distX, 4.0) - 10.0 * pow(distX, 3.0);
+    float tY = 1.0 - 6.0 * pow(distY, 5.0) + 15.0 * pow(distY, 4.0) - 10.0 * pow(distY, 3.0);
+
+    // Get the random vector for the grid point
+    vec2 gradient = random2(gridPoint);
+    // Get the vector from the grid point to P
+    vec2 diff = P - gridPoint;
+    // Get the value of our height field by dotting grid->P with our gradient
+    float height = dot(diff, gradient);
+    // Scale our height field (i.e. reduce it) by our polynomial falloff function
+    return height * tX * tY;
+}
+
+float PerlinNoise(vec2 uv)
+{
+    // Tile the space
+    vec2 uvXLYL = floor(uv);
+    vec2 uvXHYL = uvXLYL + vec2(1, 0);
+    vec2 uvXHYH = uvXLYL + vec2(1, 1);
+    vec2 uvXLYH = uvXLYL + vec2(0, 1);
+
+    return surflet(uv, uvXLYL) + surflet(uv, uvXHYL) + surflet(uv, uvXHYH) + surflet(uv, uvXLYH);
+}
+
+
+float normalizedPerlinNoise(vec2 v) {
+    return clamp(0.0, 1.0, PerlinNoise(v) + 0.5);
+}
+
+/* FBM (uses Perlin) */
+float getFBM(vec2 pt, float startFreq) {
+    float noiseSum = 0.0;
+    float amplitudeSum = 0.0;
+    float amplitude = 1.0;
+    float frequency = startFreq;
+    for (int i = 0; i < 4; i++) {
+        float perlin = normalizedPerlinNoise(pt * frequency);
+        noiseSum += perlin * amplitude;
+        amplitudeSum += amplitude;
+        amplitude *= 0.5;
+        frequency *= 2.0;
+    }
+    return noiseSum / amplitudeSum;
+}
+
+// "normalizes" coordinate before calling FBM
+float getFBMFromRawPosition(vec2 pos, float startFreq) {
+    vec2 coord = pos / 150.0;
+    coord += vec2(3.14, 5.01);// +vec2(u_PerlinSeed);
+    //return pow(sin(coord.x + coord.y), 2.0);
+    return getFBM(coord, startFreq);
+}
+
 void main()
 {
     float time = u_Time * 0.001;
@@ -50,7 +121,10 @@ void main()
     // normalize position based on aspect ratio
     vec2 pos = fs_Pos.xy * vec2(u_Dims.x / u_Dims.y, 1);
     // set default color
-    out_Col = vec4(pos * 0.5 * 0.2 + vec2(0.02), 0.0, 1.0);
+    float fbm = getFBMFromRawPosition((pos + vec2(9.91) + vec2(u_Time * 0.0003, u_Time * 0.000001)) * 18.0 * (1.0 + 0.5 * cos(u_Time * 0.0001)), 2.0);
+    // remap FBM because it's apparently in [0.25, 0.65]
+    fbm = pow(clamp(0.0, 1.0, (fbm - 0.25) / 0.6), 2.2) * 0.5;
+    out_Col = vec4(vec3(fbm), 1.0);
 
     // draw shape around mouse cursor
     if (u_MousePos.x >= -1.0) {
@@ -76,7 +150,9 @@ void main()
         metaSum += aniMetaball(p, DIR6, 0.08, TIME_OFFSET * 5.0);
         metaSum += aniMetaball(p, DIR7, 0.08, TIME_OFFSET * 6.0);
         metaSum += aniMetaball(p, DIR8, 0.08, TIME_OFFSET * 7.0);
-        vec3 BALL_COLOR = vec3(out_Col.xy, 1.0);
+        vec3 BALL_COLOR = out_Col.xyz;
+        BALL_COLOR.z = ((u_MouseButtons & 1) != 0) ? (1.0) : BALL_COLOR.z;
+        BALL_COLOR.x = ((u_MouseButtons & 2) != 0) ? (1.0) : BALL_COLOR.x;
 
         if (metaSum >= THRESHOLD) {
             out_Col.xyz = mix(out_Col.xyz, BALL_COLOR, smoothstep(0.0, BLEND_EPSILON, metaSum - THRESHOLD));

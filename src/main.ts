@@ -40,7 +40,6 @@ enum Mesh {
     N64,
     SWORD,
     LAYTON,
-    TURRET,
 }
 
 // map Mesh enums to loaded MeshAttractors
@@ -61,9 +60,6 @@ function loadAllMeshes(numParticles: number) {
 
     loadMesh("models/G_Layton.obj");
     meshAttractors[Mesh.LAYTON] = new MeshAttractor(intensity, true, mesh, 4.8, numParticles);
-
-    loadMesh("models/turret.obj");
-    meshAttractors[Mesh.TURRET] = new MeshAttractor(intensity, true, mesh, 2.0, numParticles);
 
 }
 
@@ -104,7 +100,7 @@ function loadScene() {
     bgSquare.create();
     bgSquare.setNumInstances(1);
 
-    let N = 140;
+    let N = 120;
     particleSystem = new ParticleSystem(N, square);
 
     loadAllMeshes(N * N);
@@ -152,7 +148,7 @@ function main() {
     gui.add(controls, ENABLE_CLICK_FORCES);
     //gui.add(controls, "blah");
     let colorMethodController = gui.add(controls, COLOR_METHOD, { "Rainbow (velocity direction)": ColorMethod.DIRECTION, "Minty (speed)": ColorMethod.MINTY, "Spicy (speed)": ColorMethod.SPICY, "Grapy (speed)": ColorMethod.GRAPY });
-    let meshController = gui.add(controls, MESH, { "None": Mesh.NONE, "Suicune": Mesh.SUICUNE, "N64": Mesh.N64, "Master Sword": Mesh.SWORD, "Layton": Mesh.LAYTON, "Turret": Mesh.TURRET });
+    let meshController = gui.add(controls, MESH, { "None": Mesh.NONE, "Suicune": Mesh.SUICUNE, "N64": Mesh.N64, "Master Sword": Mesh.SWORD, "Layton": Mesh.LAYTON });
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -208,6 +204,7 @@ function main() {
     ]);
 
     let isMousePressed = false;
+    let lastButtons = 0;
 
     lastTickTime = Date.now();
     let startTime = lastTickTime;
@@ -229,6 +226,7 @@ function main() {
         //lambert.setTime(time++);
         bgShader.setDims(vec2.fromValues(window.innerWidth, window.innerHeight));
         bgShader.setMousePos(mousePos);
+        bgShader.setMouseButtons(lastButtons);
         bgShader.setTime(now - startTime);
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
@@ -291,6 +289,8 @@ function main() {
         if (!controls[ENABLE_CLICK_FORCES]) {
             return;
         }
+        lastButtons = event.buttons;
+
         vec2.set(mousePos,
             2.0 * event.clientX / window.innerWidth - 1.0,
             -2.0 * event.clientY / window.innerHeight + 1.0);
@@ -318,6 +318,7 @@ function main() {
         }
         // update mouse position for shader
         vec2.set(mousePos, -2, -2);
+        lastButtons = event.buttons;
 
         if (!(event.buttons & 1)) {
             particleSystem.mouseAttractor.disable();
