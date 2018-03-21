@@ -121,7 +121,7 @@ void main()
     // normalize position based on aspect ratio
     vec2 pos = fs_Pos.xy * vec2(u_Dims.x / u_Dims.y, 1);
     // set default color
-    float fbm = getFBMFromRawPosition((pos + vec2(9.91) + vec2(u_Time * 0.0003, u_Time * 0.000001)) * 18.0 * (1.0 + 0.25 * cos(u_Time * 0.00004)), 2.0);
+    float fbm = getFBMFromRawPosition((pos + vec2(9.91) + vec2(u_Time * 0.0003, u_Time * 0.000001)) * 18.0 * (1.0 + 0.25 * cos(u_Time * 0.00008)), 2.0);
     // remap FBM because it's apparently in [0.25, 0.65]
     fbm = pow(clamp(0.0, 1.0, (fbm - 0.25) / 0.6), 2.2) * 0.5;
     out_Col = vec4(vec3(fbm), 1.0);
