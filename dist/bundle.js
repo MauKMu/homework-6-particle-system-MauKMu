@@ -3539,7 +3539,7 @@ function main() {
     Object(__WEBPACK_IMPORTED_MODULE_6__globals__["b" /* setGL */])(gl);
     // Initial call to load scene
     loadScene();
-    const camera = new __WEBPACK_IMPORTED_MODULE_5__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(50, 50, 10), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(50, 50, 0));
+    const camera = new __WEBPACK_IMPORTED_MODULE_5__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(100, 100, 100), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec3 */].fromValues(20, 20, 0));
     const renderer = new __WEBPACK_IMPORTED_MODULE_4__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor(0.2, 0.2, 0.2, 1);
     gl.enable(gl.BLEND);
@@ -12378,7 +12378,7 @@ class Camera {
         this.forward = __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].create();
         const canvas = document.getElementById('canvas');
         this.controls = __WEBPACK_IMPORTED_MODULE_0_3d_view_controls__(canvas, {
-            position: position,
+            eye: position,
             center: target,
         });
         __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["d" /* vec3 */].add(this.target, this.position, this.direction);

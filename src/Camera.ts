@@ -22,7 +22,7 @@ class Camera {
         const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
         this.controls = CameraControls(canvas, {
-            position: position,
+            eye: position,
             center: target,
         });
 
