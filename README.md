@@ -1,6 +1,17 @@
 
 # Project 6: Particle System
 
+## Student Info
+
+- Name: Mauricio Mutai
+- PennKey: `mmutai`
+
+## Live Demo
+
+Click below for the live demo!
+
+[![](images/example.png)](https://maukmu.github.io/homework-6-particle-system-MauKMu)
+
 ## External References
 - [Stack Overflow post about tracking mouse position in JavaScript](https://stackoverflow.com/questions/7790725/javascript-track-mouse-position)
 - [Mozilla documentation for addEventListener (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
