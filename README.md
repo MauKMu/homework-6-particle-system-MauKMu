@@ -12,12 +12,56 @@ Click below for the live demo!
 
 [![](images/example.png)](https://maukmu.github.io/homework-6-particle-system-MauKMu)
 
+### Quick Start
+
+- Keeping the force field enabled will make the particles create a ribbon-like pattern.
+- If click forces are enabled, you can click and hold:
+  - the left mouse button, to attract particles
+  - the right mouse button, to repel particles
+- You can hold both buttons at once!
+- You can select a mesh from the drop-down menu to make the mesh attract the particles.
+
+## Techniques Used
+
+### Particles
+
+- Each particle stores a position, velocity, acceleration, and color.
+- Its `update()` function uses simple Euler integration to compute its next position and velocity.
+
+### Particle System
+
+- The `ParticleSystem` class stores all the particles, as well as the VBOs used for instanced rendering (i.e., positions and colors for each particle). Each particle is rendered as a billboard.
+- It manages updating them on each tick. In its `update()` function, for each particle, the `ParticleSystem`:
+  - applies relevant forces to the particle
+  - calls the particle's own `update()`
+  - updates the particle's color
+  - updates its instance VBOs
+- At the end of its `update()`, the system passes the new instance VBOs to the square geometry.
+- The particle system can apply one of a few coloring methods to its particles. One of them ("Rainbow") depends on the direction of the particle's velocity, while the other three depend on the particle's speed (length of velocity vector).
+  - The "Rainbow" method maps the normalized direction to RGB space.
+  - The other methods use a palette created with [Adobe's color wheel](https://color.adobe.com/create/color-wheel/). Since each palette has five colors, these coloring methods discretize the particle's speed values into five buckets, which map directly to the colors on the palette. For example, on the "Minty" palette, slow particles are cyan, while faster particles are green.
+- The particle system can also apply an optional "spherical force field". This name comes from the fact that the computation of the field's forces resembles the computation of the tangent and bitangent vectors of a point on a sphere. This is the force field that can be toggled on the GUI.
+
+### Target Forces
+
+- A `TargetForce` represents a force that makes a particle move towards or away from a specified target position.
+
+#### Attractor
+
+- The `Attractor` forces, when applied to a particle, will add acceleration towards the target. This acceleration is scaled by the distance to the target (clamped to an appropriate range), such that more distant particles move more quickly towards the target.
+- In addition, the `Attractor` will attempt to slow down the particle if it is already somewhat close to the target. This was done to avoid an effect where particles would never "converge" towards the target. They would instead oscillate around the target, and this oscillation had an undesirably large amplitude. With this, the `Attractor` is able to make particles "orbit" around the target, albeit a bit chaotically.
+
+#### Repeller (or Repulsor)
+
+- The `Repeller` forces, when applied to a particle, will add acceleration away from the target. This acceleration is scaled by the *inverse* of distance to the target (clamped to an appropriate range), such that more distant particles are not significantly affected by this force.
+
 ## External References
 - [Stack Overflow post about tracking mouse position in JavaScript](https://stackoverflow.com/questions/7790725/javascript-track-mouse-position)
 - [Mozilla documentation for addEventListener (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
 - [Mozilla documentation for MouseEvent (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent)
 - [Stack Overflow post about generating random points inside triangle](https://stackoverflow.com/questions/19654251/random-point-inside-triangle-inside-java)
 - [Stack Exchange post about generating random points inside triangle](https://math.stackexchange.com/questions/18686/uniform-random-point-in-triangle)
+- [The Models Resource, where I got the OBJs from](https://www.models-resource.com/)
 
 
 
