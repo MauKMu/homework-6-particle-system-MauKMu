@@ -55,6 +55,21 @@ Click below for the live demo!
 
 - The `Repeller` forces, when applied to a particle, will add acceleration away from the target. This acceleration is scaled by the *inverse* of distance to the target (clamped to an appropriate range), such that more distant particles are not significantly affected by this force.
 
+#### Mesh Attractor
+
+- A `MeshAttractor` is essentially a collection of `Attractors` whose end-goal is to make the particles be attracted to the surface of a mesh. To this end, the target of each `Attractor` is either a vertex of the mesh, or a random point on one of the mesh's triangles.
+    - More specifically, the `MeshAttractor` will first create one `Attractor` for each vertex on the mesh. If there are enough remaining particles (this number is passed in the constructor), it will compute a number of "runs". Each run is equivalent to adding one `Attractor` for each triangle on the mesh, where the target position is a randomly chosen point on the triangle. The `MeshAttractor` will attempt **not** to do enough runs to use all particles, so as to leave some particles for the user to interact with.
+- All `MeshAttractors` are initialized when the program first loads, so that they can be swapped quickly.
+
+### Mouse Interactions
+
+- The user can click and hold the left mouse button to attract particles to the cursor, or click and hold the right mouse button to move particles away from the cursor.
+- This is accomplished by raycasting through the mouse's position on the screen. We pick a point `P` at a fixed distance from the ray's origin, and make `P` the target of an `Attractor` and/or `Repeller`. Note that this makes the mouse's effect cover a spherical area, rather than a rectangular one.
+
+### Background
+
+- The background is rendered on a separate screen-space quad with Z = 1. It uses FBM'd Perlin noise to generate a "smoky" look. It also receives information about the mouse in order to draw a metaball when the user is applying a "click force".
+
 ## External References
 - [Stack Overflow post about tracking mouse position in JavaScript](https://stackoverflow.com/questions/7790725/javascript-track-mouse-position)
 - [Mozilla documentation for addEventListener (for getting mouse position)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener)
