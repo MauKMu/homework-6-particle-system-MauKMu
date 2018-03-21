@@ -6,7 +6,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
-import ParticleSystem from './particles/ParticleSystem';
+import {ParticleSystem, ColorMethod} from './particles/ParticleSystem';
 import MeshAttractor from './particles/MeshAttractor';
 
 var OBJ = require('webgl-obj-loader');
@@ -38,12 +38,14 @@ function loadMesh(filename: string) {
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const ENABLE_CAM_MOVEMENT = "Enable camera movement"
 const ENABLE_CLICK_FORCES = "Enable click forces"
+const COLOR_METHOD = "Coloring method"
 const controls = {
     tesselations: 5,
     'Load Scene': loadScene, // A function pointer, essentially
     "Enable camera movement": true,
     "Enable click forces": true,
-    blah: bleh,
+    blah: bleh, // admit it, this is the best line of code you've ever seen.
+    "Coloring method": ColorMethod.DIRECTION,
 };
 
 let square: Square;
@@ -111,6 +113,7 @@ function main() {
     let camMovController = gui.add(controls, ENABLE_CAM_MOVEMENT);
     gui.add(controls, ENABLE_CLICK_FORCES);
     //gui.add(controls, "blah");
+    let colorMethodController = gui.add(controls, COLOR_METHOD, { "Rainbow (velocity direction)": ColorMethod.DIRECTION, "Minty (speed)": ColorMethod.MINTY, "Spicy (speed)": ColorMethod.SPICY, "Grapy (speed)": ColorMethod.GRAPY });
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -144,6 +147,10 @@ function main() {
             camera.controls.zoomSpeed = 0;
             camera.controls.translateSpeed = 0;
         }
+    });
+
+    colorMethodController.onChange(function () {
+        particleSystem.setColorMethod(controls[COLOR_METHOD]);
     });
 
     const lambert = new ShaderProgram([

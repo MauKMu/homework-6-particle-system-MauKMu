@@ -31,7 +31,14 @@ const GRAPY_PALETTE = [
     vec4.fromValues(183 / 255, 255 / 255, 90 / 255, 1),
 ];
 
-class ParticleSystem {
+export enum ColorMethod {
+    DIRECTION = 1,
+    MINTY,
+    SPICY,
+    GRAPY,
+};
+
+export class ParticleSystem {
     particles: Array<Particle>;
     offsets: Float32Array;
     colors: Float32Array;
@@ -68,8 +75,7 @@ class ParticleSystem {
         this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
         this.meshAttractor = null;
 
-        this.colorFunction = this.colorByGrapyPalette;
-        //this.colorFunction = this.colorByVelDir;
+        this.colorFunction = this.colorByVelDir;
     }
 
     updateInstanceArrays(particle: Particle, index: number) {
@@ -112,6 +118,21 @@ class ParticleSystem {
         vec4.copy(particle.color, GRAPY_PALETTE[idx]);
     }
 
+    setColorMethod(method: ColorMethod) {
+        if (method == ColorMethod.DIRECTION) {
+            this.colorFunction = this.colorByVelDir;
+        }
+        else if (method == ColorMethod.MINTY) {
+            this.colorFunction = this.colorByMintyPalette;
+        }
+        else if (method == ColorMethod.SPICY) {
+            this.colorFunction = this.colorBySpicyPalette;
+        }
+        else if (method == ColorMethod.GRAPY) {
+            this.colorFunction = this.colorByGrapyPalette;
+        }
+    }
+
     // dT: delta time
     update(dT: number) {
         let newTime = this.accTime + dT;
@@ -143,5 +164,3 @@ class ParticleSystem {
         this.square.setInstanceVBOs(this.offsets, this.colors);
     }
 };
-
-export default ParticleSystem;
