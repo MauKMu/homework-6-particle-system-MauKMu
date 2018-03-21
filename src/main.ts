@@ -34,11 +34,46 @@ function loadMesh(filename: string) {
     readTextFile(filename);
 }
 
+enum Mesh {
+    NONE = 1,
+    SUICUNE,
+    N64,
+    SWORD,
+    LAYTON,
+    TURRET,
+}
+
+// map Mesh enums to loaded MeshAttractors
+let meshAttractors: { [id: number]: MeshAttractor } = {};
+meshAttractors[Mesh.NONE] = null;
+
+function loadAllMeshes(numParticles: number) {
+    const intensity = 0.0001;
+
+    loadMesh("models/suicune.obj");
+    meshAttractors[Mesh.SUICUNE] = new MeshAttractor(intensity, true, mesh, 2.7, numParticles);
+
+    loadMesh("models/n64.obj");
+    meshAttractors[Mesh.N64] = new MeshAttractor(intensity, true, mesh, 0.1, numParticles);
+
+    loadMesh("models/mastersword.obj");
+    meshAttractors[Mesh.SWORD] = new MeshAttractor(intensity, true, mesh, 2.5, numParticles);
+
+    loadMesh("models/G_Layton.obj");
+    meshAttractors[Mesh.LAYTON] = new MeshAttractor(intensity, true, mesh, 4.8, numParticles);
+
+    loadMesh("models/turret.obj");
+    meshAttractors[Mesh.TURRET] = new MeshAttractor(intensity, true, mesh, 2.0, numParticles);
+
+}
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
-const ENABLE_CAM_MOVEMENT = "Enable camera movement"
-const ENABLE_CLICK_FORCES = "Enable click forces"
-const COLOR_METHOD = "Coloring method"
+const ENABLE_CAM_MOVEMENT = "Enable camera movement";
+const ENABLE_CLICK_FORCES = "Enable click forces";
+const COLOR_METHOD = "Coloring method";
+const MESH = "Mesh";
+
 const controls = {
     tesselations: 5,
     'Load Scene': loadScene, // A function pointer, essentially
@@ -46,6 +81,7 @@ const controls = {
     "Enable click forces": true,
     blah: bleh, // admit it, this is the best line of code you've ever seen.
     "Coloring method": ColorMethod.DIRECTION,
+    "Mesh": Mesh.NONE,
 };
 
 let square: Square;
@@ -68,12 +104,14 @@ function loadScene() {
     bgSquare.create();
     bgSquare.setNumInstances(1);
 
-    particleSystem = new ParticleSystem(50, square);
+    let N = 140;
+    particleSystem = new ParticleSystem(N, square);
 
-    loadMesh("models/n64.obj");
-    console.log(mesh);
-    let ma = new MeshAttractor(0.0001, true, mesh, 0.5);
-    particleSystem.setMeshAttractor(ma);
+    loadAllMeshes(N * N);
+    //loadMesh("models/mastersword.obj");
+    //console.log(mesh);
+    //let ma = new MeshAttractor(0.0001, true, mesh, 2.5, NUM_PARTICLES * NUM_PARTICLES);
+    //particleSystem.setMeshAttractor(ma);
 
     /*
     // Set up particles here. Hard-coded example data for now
@@ -114,6 +152,7 @@ function main() {
     gui.add(controls, ENABLE_CLICK_FORCES);
     //gui.add(controls, "blah");
     let colorMethodController = gui.add(controls, COLOR_METHOD, { "Rainbow (velocity direction)": ColorMethod.DIRECTION, "Minty (speed)": ColorMethod.MINTY, "Spicy (speed)": ColorMethod.SPICY, "Grapy (speed)": ColorMethod.GRAPY });
+    let meshController = gui.add(controls, MESH, { "None": Mesh.NONE, "Suicune": Mesh.SUICUNE, "N64": Mesh.N64, "Master Sword": Mesh.SWORD, "Layton": Mesh.LAYTON, "Turret": Mesh.TURRET });
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -151,6 +190,11 @@ function main() {
 
     colorMethodController.onChange(function () {
         particleSystem.setColorMethod(controls[COLOR_METHOD]);
+    });
+
+    meshController.onChange(function () {
+        console.log(meshAttractors);
+        particleSystem.setMeshAttractor(meshAttractors[controls[MESH]]);
     });
 
     const lambert = new ShaderProgram([

@@ -11,7 +11,7 @@ function clamp(min: number, max: number, val: number): number {
 class MeshAttractor extends TargetForce {
     attractors: Array<Attractor>;
 
-    constructor(intensity: number, enable: boolean, mesh: any, meshScale: number) {
+    constructor(intensity: number, enable: boolean, mesh: any, meshScale: number, numParticles: number) {
         super(vec3.create(), intensity, enable);
 
         this.attractors = [];
@@ -20,8 +20,15 @@ class MeshAttractor extends TargetForce {
             this.attractors.push(new Attractor(vec3.fromValues(mesh.vertices[i] * meshScale, mesh.vertices[i + 1] * meshScale, mesh.vertices[i + 2] * meshScale), this.intensity, true));
         }
 
+        let numTris = mesh.indices.length / 3;
+        let particlesLeft = numParticles * 0.7 - this.attractors.length;
+        let numRuns = Math.ceil(particlesLeft / numTris);
+        console.log("BLAH");
+        console.log(particlesLeft);
+        console.log(numRuns);
+
         let scratch = vec3.create();
-        for (let j = 0; j < 10; j++) {
+        for (let j = 0; j < numRuns; j++) {
             for (let i = 0; i < mesh.indices.length; i += 3) {
                 this.addRandomPointOnTriangle(mesh, i, scratch);
             }
