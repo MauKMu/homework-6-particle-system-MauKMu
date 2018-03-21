@@ -23,6 +23,14 @@ const SPICY_PALETTE = [
     vec4.fromValues(255 / 255, 49 / 255, 13 / 255, 1),
 ];
 
+const GRAPY_PALETTE = [
+    vec4.fromValues(156 / 255, 45 / 255, 178 / 255, 1),
+    vec4.fromValues(231 / 255, 116 / 255, 255 / 255, 1),
+    vec4.fromValues(227 / 255, 90 / 255, 255 / 255, 1),
+    vec4.fromValues(113 / 255, 178 / 255, 27 / 255, 1),
+    vec4.fromValues(183 / 255, 255 / 255, 90 / 255, 1),
+];
+
 class ParticleSystem {
     particles: Array<Particle>;
     offsets: Float32Array;
@@ -60,7 +68,7 @@ class ParticleSystem {
         this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
         this.meshAttractor = null;
 
-        this.colorFunction = this.colorBySpicyPalette;
+        this.colorFunction = this.colorByGrapyPalette;
         //this.colorFunction = this.colorByVelDir;
     }
 
@@ -96,6 +104,12 @@ class ParticleSystem {
         let speed = vec3.len(particle.velocity);
         let idx = Math.min(4, Math.floor(speed * 30.0));
         vec4.copy(particle.color, SPICY_PALETTE[idx]);
+    }
+
+    colorByGrapyPalette(particle: Particle) {
+        let speed = vec3.len(particle.velocity);
+        let idx = Math.min(4, Math.floor(speed * 40.0));
+        vec4.copy(particle.color, GRAPY_PALETTE[idx]);
     }
 
     // dT: delta time
