@@ -7,6 +7,22 @@ import {vec3, vec4, mat4} from 'gl-matrix';
 
 const BASE_COLOR = vec3.fromValues(0.3, 0.3, 0.3);
 
+const MINTY_PALETTE = [
+    vec4.fromValues(13 / 255, 251 / 255, 255 / 255, 1),
+    vec4.fromValues(12 / 255, 232 / 255, 173 / 255, 1),
+    vec4.fromValues(0 / 255, 255 / 255, 115 / 255, 1),
+    vec4.fromValues(12 / 255, 232 / 255, 48 / 255, 1),
+    vec4.fromValues(47 / 255, 255 / 255, 13 / 255, 1),
+];
+
+const SPICY_PALETTE = [
+    vec4.fromValues(255 / 255, 179 / 255, 13 / 255, 1),
+    vec4.fromValues(232 / 255, 141 / 255, 12 / 255, 1),
+    vec4.fromValues(255 / 255, 113 / 255, 0 / 255, 1),
+    vec4.fromValues(232 / 255, 77 / 255, 12 / 255, 1),
+    vec4.fromValues(255 / 255, 49 / 255, 13 / 255, 1),
+];
+
 class ParticleSystem {
     particles: Array<Particle>;
     offsets: Float32Array;
@@ -18,6 +34,8 @@ class ParticleSystem {
     mouseAttractor: Attractor;
     mouseRepeller: Repeller;
     meshAttractor: MeshAttractor;
+
+    colorFunction: (particle: Particle) => void;
 
     constructor(n: number, square: Square) {
         this.accTime = 0.0;
@@ -41,6 +59,9 @@ class ParticleSystem {
         this.mouseAttractor = new Attractor(vec3.fromValues(0, 0, 0), 0.0003, false);
         this.mouseRepeller = new Repeller(vec3.fromValues(0, 0, 0), 0.0001, false);
         this.meshAttractor = null;
+
+        this.colorFunction = this.colorBySpicyPalette;
+        //this.colorFunction = this.colorByVelDir;
     }
 
     updateInstanceArrays(particle: Particle, index: number) {
@@ -56,6 +77,25 @@ class ParticleSystem {
 
     setMeshAttractor(meshAttractor: MeshAttractor) {
         this.meshAttractor = meshAttractor;
+    }
+
+    colorByVelDir(particle: Particle) {
+        let dir = vec3.create();
+        vec3.normalize(dir, particle.velocity);
+        vec3.scaleAndAdd(dir, BASE_COLOR, dir, 0.3);
+        vec4.set(particle.color, dir[0], dir[1], dir[2], 1.0);
+    }
+
+    colorByMintyPalette(particle: Particle) {
+        let speed = vec3.len(particle.velocity);
+        let idx = Math.min(4, Math.floor(speed * 50.0));
+        vec4.copy(particle.color, MINTY_PALETTE[idx]);
+    }
+
+    colorBySpicyPalette(particle: Particle) {
+        let speed = vec3.len(particle.velocity);
+        let idx = Math.min(4, Math.floor(speed * 30.0));
+        vec4.copy(particle.color, SPICY_PALETTE[idx]);
     }
 
     // dT: delta time
@@ -82,9 +122,7 @@ class ParticleSystem {
             vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
             // set color
-            vec3.normalize(dir, value.velocity);
-            vec3.scaleAndAdd(dir, BASE_COLOR, dir, 0.3);
-            vec4.set(value.color, dir[0], dir[1], dir[2], 1.0);
+            this.colorFunction(value);
             this.updateInstanceArrays(value, index);
         }, this);
 
