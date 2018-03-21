@@ -69,6 +69,7 @@ const ENABLE_CAM_MOVEMENT = "Enable camera movement";
 const ENABLE_CLICK_FORCES = "Enable click forces";
 const COLOR_METHOD = "Coloring method";
 const MESH = "Mesh";
+const ENABLE_FORCE_FIELD = "Enable force field";
 
 const controls = {
     tesselations: 5,
@@ -78,6 +79,7 @@ const controls = {
     blah: bleh, // admit it, this is the best line of code you've ever seen.
     "Coloring method": ColorMethod.DIRECTION,
     "Mesh": Mesh.NONE,
+    "Enable force field": true,
 };
 
 let square: Square;
@@ -149,6 +151,7 @@ function main() {
     //gui.add(controls, "blah");
     let colorMethodController = gui.add(controls, COLOR_METHOD, { "Rainbow (velocity direction)": ColorMethod.DIRECTION, "Minty (speed)": ColorMethod.MINTY, "Spicy (speed)": ColorMethod.SPICY, "Grapy (speed)": ColorMethod.GRAPY });
     let meshController = gui.add(controls, MESH, { "None": Mesh.NONE, "Suicune": Mesh.SUICUNE, "N64": Mesh.N64, "Master Sword": Mesh.SWORD, "Layton": Mesh.LAYTON });
+    let fieldController = gui.add(controls, ENABLE_FORCE_FIELD);
 
     // get canvas and webgl context
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -191,6 +194,10 @@ function main() {
     meshController.onChange(function () {
         console.log(meshAttractors);
         particleSystem.setMeshAttractor(meshAttractors[controls[MESH]]);
+    });
+
+    fieldController.onChange(function (val: boolean) {
+        particleSystem.useForceField = val;
     });
 
     const lambert = new ShaderProgram([

@@ -51,6 +51,7 @@ export class ParticleSystem {
     meshAttractor: MeshAttractor;
 
     colorFunction: (particle: Particle) => void;
+    useForceField: boolean;
 
     constructor(n: number, square: Square) {
         this.accTime = 0.0;
@@ -76,6 +77,7 @@ export class ParticleSystem {
         this.meshAttractor = null;
 
         this.colorFunction = this.colorByVelDir;
+        this.useForceField = true;
     }
 
     updateInstanceArrays(particle: Particle, index: number) {
@@ -118,6 +120,24 @@ export class ParticleSystem {
         vec4.copy(particle.color, GRAPY_PALETTE[idx]);
     }
 
+
+    sphericalField(particle: Particle) {
+        const UP = vec3.fromValues(0, 1, 0);
+        let toParticle = vec3.clone(particle.position);
+        vec3.normalize(toParticle, toParticle);
+        let bit = vec3.create();
+        vec3.cross(bit, toParticle, UP);
+        let tan = vec3.create();
+        vec3.cross(tan, bit, toParticle);
+
+        vec3.scale(toParticle, toParticle, -0.000002);
+        vec3.scale(tan, tan, -0.000008);
+        vec3.scale(bit, bit, -0.000002);
+        vec3.add(particle.acceleration, particle.acceleration, toParticle);
+        vec3.add(particle.acceleration, particle.acceleration, tan);
+        vec3.add(particle.acceleration, particle.acceleration, bit);
+    }
+
     setColorMethod(method: ColorMethod) {
         if (method == ColorMethod.DIRECTION) {
             this.colorFunction = this.colorByVelDir;
@@ -153,6 +173,9 @@ export class ParticleSystem {
             this.mouseRepeller.applyForce(value);
             if (this.meshAttractor != null) {
                 this.meshAttractor.applyMeshForce(value, index);
+            }
+            if (this.useForceField) {
+                this.sphericalField(value);
             }
             vec3.scale(value.velocity, value.velocity, drag);
             value.update(dT);
